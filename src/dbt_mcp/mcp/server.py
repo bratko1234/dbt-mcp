@@ -6,7 +6,6 @@ from contextlib import (
 )
 from typing import Any
 
-from dbtlabs_vortex.producer import shutdown
 from mcp.server.fastmcp import FastMCP
 from mcp.types import (
     ContentBlock,
@@ -36,7 +35,12 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[None]:
         raise e
     finally:
         logger.info("Shutting down MCP server")
-        shutdown()
+        # Only shutdown vortex if it was imported (when dbt features are enabled)
+        try:
+            from dbtlabs_vortex.producer import shutdown
+            shutdown()
+        except ImportError:
+            pass
 
 
 class DbtMCP(FastMCP):
