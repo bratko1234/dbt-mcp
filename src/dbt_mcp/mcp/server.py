@@ -16,6 +16,9 @@ from mcp.types import (
 from dbt_mcp.config.config import Config
 from dbt_mcp.dbt_cli.tools import register_dbt_cli_tools
 from dbt_mcp.discovery.tools import register_discovery_tools
+from dbt_mcp.lightdash.tools import register_lightdash_tools
+from dbt_mcp.lightdash.prompts import register_lightdash_prompts
+from dbt_mcp.lightdash.resources import register_lightdash_resources
 from dbt_mcp.remote.tools import register_remote_tools
 from dbt_mcp.semantic_layer.tools import register_sl_tools
 from dbt_mcp.tracking.tracking import UsageTracker
@@ -116,5 +119,13 @@ async def create_dbt_mcp(config: Config):
     if config.remote_config:
         logger.info("Registering remote tools")
         await register_remote_tools(dbt_mcp, config.remote_config, config.disable_tools)
+
+    if config.lightdash_config:
+        logger.info("Registering Lightdash tools")
+        register_lightdash_tools(dbt_mcp, config.lightdash_config, config.disable_tools)
+        logger.info("Registering Lightdash prompts")
+        register_lightdash_prompts(dbt_mcp, config.lightdash_config)
+        logger.info("Registering Lightdash resources")
+        register_lightdash_resources(dbt_mcp, config.lightdash_config)
 
     return dbt_mcp

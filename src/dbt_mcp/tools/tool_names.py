@@ -35,6 +35,18 @@ class ToolName(Enum):
     # Remote tools
     TEXT_TO_SQL = "text_to_sql"
     EXECUTE_SQL = "execute_sql"
+    
+    # Lightdash tools
+    LIGHTDASH_LIST_SPACES = "lightdash_list_spaces"
+    LIGHTDASH_LIST_CHARTS = "lightdash_list_charts"
+    LIGHTDASH_GET_CHART = "lightdash_get_chart"
+    LIGHTDASH_CREATE_CHART = "lightdash_create_chart"
+    LIGHTDASH_UPDATE_CHART = "lightdash_update_chart"
+    LIGHTDASH_DELETE_CHART = "lightdash_delete_chart"
+    LIGHTDASH_LIST_EXPLORES = "lightdash_list_explores"
+    LIGHTDASH_GET_EXPLORE = "lightdash_get_explore"
+    # LIGHTDASH_RUN_QUERY removed - was for semantic layer integration
+    # Use LIGHTDASH_RUN_METRIC_QUERY instead
 
     @classmethod
     def get_all_tool_names(cls) -> set[str]:
