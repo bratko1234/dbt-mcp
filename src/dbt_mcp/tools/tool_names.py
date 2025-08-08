@@ -45,6 +45,7 @@ class ToolName(Enum):
     LIGHTDASH_DELETE_CHART = "lightdash_delete_chart"
     LIGHTDASH_LIST_EXPLORES = "lightdash_list_explores"
     LIGHTDASH_GET_EXPLORE = "lightdash_get_explore"
+    LIGHTDASH_GET_EMBED_URL = "lightdash_get_embed_url"
     # LIGHTDASH_RUN_QUERY removed - was for semantic layer integration
     # Use LIGHTDASH_RUN_METRIC_QUERY instead
 

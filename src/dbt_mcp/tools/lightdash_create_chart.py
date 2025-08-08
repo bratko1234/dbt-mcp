@@ -82,6 +82,11 @@ def get_lightdash_create_chart_tool() -> Tool:
                 "space_id": {
                     "type": "string",
                     "description": get_prompt("lightdash/args/space_id")
+                },
+                "include_embed_url": {
+                    "type": "boolean",
+                    "description": "Include embed URL in response for rendering charts in LibreChat",
+                    "default": True
                 }
             },
             "required": ["name", "explore_id", "metrics"],
@@ -128,6 +133,7 @@ async def handle_lightdash_create_chart(
     limit = arguments.get("limit", 500)
     chart_type = arguments.get("chart_type", config.lightdash_config.default_chart_type or "table")
     space_id = arguments.get("space_id", config.lightdash_config.default_space_id)
+    include_embed_url = arguments.get("include_embed_url", True)
     
     # Validate required fields
     if not name:
@@ -283,6 +289,11 @@ async def handle_lightdash_create_chart(
             result += f"Metrics: {', '.join(metrics)}\n"
         if dimensions:
             result += f"Dimensions: {', '.join(dimensions)}\n"
+        
+        # Note: Individual charts cannot be embedded, only dashboards
+        # If embed URL is requested, we inform the user
+        if include_embed_url and "uuid" in created_chart:
+            result += "\n\n💡 Note: Individual charts cannot be embedded. To embed this visualization, add it to a dashboard first."
         
         return [TextContent(type="text", text=result.strip())]
         

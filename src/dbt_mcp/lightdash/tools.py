@@ -47,6 +47,10 @@ from dbt_mcp.tools.lightdash_get_user import (
     get_lightdash_get_user_tool,
     handle_lightdash_get_user,
 )
+from dbt_mcp.tools.lightdash_get_embed_url import (
+    get_lightdash_get_embed_url_tool,
+    handle_lightdash_get_embed_url,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -171,3 +175,15 @@ def register_lightdash_tools(
         async def get_user_handler(arguments):
             return await handle_lightdash_get_user(arguments, config)
         logger.info("Registered lightdash_get_user tool")
+    
+    # Get Embed URL tool
+    if ToolName.LIGHTDASH_GET_EMBED_URL not in disable_tools:
+        tool_def = get_lightdash_get_embed_url_tool()
+        @mcp.tool(
+            name=tool_def.name,
+            description=tool_def.description,
+            structured_output=False
+        )
+        async def get_embed_url_handler(arguments):
+            return await handle_lightdash_get_embed_url(arguments, config)
+        logger.info("Registered lightdash_get_embed_url tool")
