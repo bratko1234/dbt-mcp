@@ -8,7 +8,6 @@ from mcp.types import Tool, TextContent
 from dbt_mcp.config.config import Config
 from dbt_mcp.lightdash.client import LightdashAPIClient
 from dbt_mcp.lightdash.mapping import get_model_explore_mapper
-from dbt_mcp.semantic_layer.client import SemanticLayerFetcher
 from dbt_mcp.tools.tool_names import ToolName
 from dbt_mcp.prompts.prompts import get_prompt
 
@@ -53,6 +52,7 @@ async def handle_enhanced_list_metrics(
     if config.semantic_layer_config:
         try:
             from dbt_mcp.semantic_layer.sl_service import SLService
+            from dbt_mcp.semantic_layer.client import SemanticLayerFetcher
             sl_service = SLService(config.semantic_layer_config)
             sl_client = sl_service.get_sl_client()
             fetcher = SemanticLayerFetcher(sl_client, config.semantic_layer_config)

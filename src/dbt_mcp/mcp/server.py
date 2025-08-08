@@ -13,13 +13,9 @@ from mcp.types import (
 )
 
 from dbt_mcp.config.config import Config
-from dbt_mcp.dbt_cli.tools import register_dbt_cli_tools
-from dbt_mcp.discovery.tools import register_discovery_tools
 from dbt_mcp.lightdash.tools import register_lightdash_tools
 from dbt_mcp.lightdash.prompts import register_lightdash_prompts
 from dbt_mcp.lightdash.resources import register_lightdash_resources
-from dbt_mcp.remote.tools import register_remote_tools
-from dbt_mcp.semantic_layer.tools import register_sl_tools
 from dbt_mcp.tracking.tracking import UsageTracker
 
 logger = logging.getLogger(__name__)
@@ -109,19 +105,23 @@ async def create_dbt_mcp(config: Config):
 
     if config.semantic_layer_config:
         logger.info("Registering semantic layer tools")
+        from dbt_mcp.semantic_layer.tools import register_sl_tools
         register_sl_tools(dbt_mcp, config.semantic_layer_config, config.disable_tools)
 
     if config.discovery_config:
         logger.info("Registering discovery tools")
+        from dbt_mcp.discovery.tools import register_discovery_tools
         register_discovery_tools(dbt_mcp, config.discovery_config, config.disable_tools)
 
     if config.dbt_cli_config:
         logger.info("Registering dbt cli tools")
         # TODO: allow for disabling CLI tools
+        from dbt_mcp.dbt_cli.tools import register_dbt_cli_tools
         register_dbt_cli_tools(dbt_mcp, config.dbt_cli_config, [])
 
     if config.remote_config:
         logger.info("Registering remote tools")
+        from dbt_mcp.remote.tools import register_remote_tools
         await register_remote_tools(dbt_mcp, config.remote_config, config.disable_tools)
 
     if config.lightdash_config:

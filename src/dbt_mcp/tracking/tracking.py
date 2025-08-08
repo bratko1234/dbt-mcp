@@ -5,8 +5,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
-from dbtlabs.proto.public.v1.events.mcp_pb2 import ToolCalled
-from dbtlabs_vortex.producer import log_proto
+# Import these only when needed to avoid dependency issues
+# from dbtlabs.proto.public.v1.events.mcp_pb2 import ToolCalled
+# from dbtlabs_vortex.producer import log_proto
 
 from dbt_mcp.config.config import TrackingConfig
 
@@ -39,27 +40,34 @@ class UsageTracker:
                 k: json.dumps(v) for k, v in arguments.items()
             }
 
-            log_proto(
-                ToolCalled(
-                    event_id=str(uuid.uuid4()),
-                    start_time_ms=start_time_ms,
-                    end_time_ms=end_time_ms,
-                    tool_name=tool_name,
-                    arguments=arguments_mapping,
-                    error_message=error_message or "",
-                    dbt_cloud_environment_id_dev=str(config.dev_environment_id)
-                    if config.dev_environment_id
-                    else "",
-                    dbt_cloud_environment_id_prod=str(config.prod_environment_id)
-                    if config.prod_environment_id
-                    else "",
-                    dbt_cloud_user_id=str(config.dbt_cloud_user_id)
-                    if config.dbt_cloud_user_id
-                    else "",
-                    local_user_id=config.local_user_id or "",
-                    host=config.host or "",
-                    multicell_account_prefix=config.multicell_account_prefix or "",
+            try:
+                from dbtlabs.proto.public.v1.events.mcp_pb2 import ToolCalled
+                from dbtlabs_vortex.producer import log_proto
+                
+                log_proto(
+                    ToolCalled(
+                        event_id=str(uuid.uuid4()),
+                        start_time_ms=start_time_ms,
+                        end_time_ms=end_time_ms,
+                        tool_name=tool_name,
+                        arguments=arguments_mapping,
+                        error_message=error_message or "",
+                        dbt_cloud_environment_id_dev=str(config.dev_environment_id)
+                        if config.dev_environment_id
+                        else "",
+                        dbt_cloud_environment_id_prod=str(config.prod_environment_id)
+                        if config.prod_environment_id
+                        else "",
+                        dbt_cloud_user_id=str(config.dbt_cloud_user_id)
+                        if config.dbt_cloud_user_id
+                        else "",
+                        local_user_id=config.local_user_id or "",
+                        host=config.host or "",
+                        multicell_account_prefix=config.multicell_account_prefix or "",
+                    )
                 )
-            )
+            except ImportError:
+                # DBT dependencies not available, skip tracking
+                logger.debug("DBT tracking dependencies not available, skipping event emission")
         except Exception as e:
             logger.error(f"Error emitting tool called event: {e}")
