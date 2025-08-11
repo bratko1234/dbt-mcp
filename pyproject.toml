@@ -5,7 +5,7 @@ authors = [{ name = "Brat", email = "brat@inceptly.com" }]
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
-version = "0.7.0"
+version = "0.8.3"
 classifiers = [
   "License :: OSI Approved :: Apache Software License",
   "Programming Language :: Python :: 3",

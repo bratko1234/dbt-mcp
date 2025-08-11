@@ -187,3 +187,121 @@ class LightdashAPIClient:
         endpoint = "/user"
         result = await self._make_request("GET", endpoint)
         return result.get("results", {})
+    
+    async def list_dashboards(self, space_id: Optional[str] = None) -> List[Dict[str, Any]]:
+        """List all dashboards, optionally filtered by space"""
+        endpoint = f"/projects/{self.project_id}/dashboards"
+        params = {"spaceUuid": space_id} if space_id else None
+        result = await self._make_request("GET", endpoint, params=params)
+        return result.get("results", [])
+    
+    async def get_dashboard(self, dashboard_id: str) -> Dict[str, Any]:
+        """Get details of a specific dashboard"""
+        endpoint = f"/dashboards/{dashboard_id}"
+        result = await self._make_request("GET", endpoint)
+        return result.get("results", {})
+    
+    async def create_dashboard(
+        self,
+        name: str,
+        description: Optional[str],
+        tiles: List[Dict[str, Any]],
+        space_uuid: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Create a new dashboard in Lightdash"""
+        space_id = space_uuid or self.default_space_id
+        if not space_id:
+            # Get the first available space if no default
+            spaces = await self.list_spaces()
+            if not spaces:
+                raise Exception("No spaces available in Lightdash project")
+            space_id = spaces[0]["uuid"]
+        
+        # Lightdash API expects different field names
+        # Try the original field names first
+        data = {
+            "name": name,
+            "description": description,
+            "tiles": tiles,
+            "spaceUuid": space_id
+        }
+        
+        # Log the request for debugging
+        logger.info(f"Creating dashboard with data: {json.dumps(data, indent=2)}")
+        
+        # Try different endpoint structure - maybe it needs to be more specific
+        endpoint = f"/projects/{self.project_id}/dashboards"
+        
+        # CreateDashboard requires tabs field
+        data = {
+            "name": name,
+            "description": description,
+            "tiles": tiles if tiles else [],
+            "tabs": [],  # Empty tabs array for now
+            "spaceUuid": space_id
+        }
+        
+        logger.info(f"Creating dashboard with data: {json.dumps(data, indent=2)}")
+        
+        result = await self._make_request("POST", endpoint, data=data)
+        return result.get("results", {})
+    
+    async def update_dashboard(self, dashboard_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:
+        """Update an existing dashboard"""
+        endpoint = f"/dashboards/{dashboard_id}"
+        result = await self._make_request("PATCH", endpoint, data=updates)
+        return result.get("results", {})
+    
+    async def delete_dashboard(self, dashboard_id: str) -> None:
+        """Delete a dashboard"""
+        endpoint = f"/dashboards/{dashboard_id}"
+        await self._make_request("DELETE", endpoint)
+    
+    async def get_embed_url(
+        self,
+        resource_type: str,
+        resource_uuid: str,
+        expires_in: str = "8h",
+        user_attributes: Optional[Dict[str, Any]] = None,
+        dashboard_filters_interactivity: Optional[Dict[str, Any]] = None,
+        can_export_csv: bool = False,
+        can_export_images: bool = False
+    ) -> str:
+        """Generate an embed URL for a chart or dashboard"""
+        # Prepare the request body
+        embed_request = {
+            "content": {
+                "type": resource_type,
+            },
+            "expiresIn": expires_in,
+        }
+        
+        # Add resource UUID based on type
+        if resource_type == "dashboard":
+            embed_request["content"]["dashboardUuid"] = resource_uuid
+        else:
+            embed_request["content"]["savedChartUuid"] = resource_uuid
+        
+        # Add user attributes if provided
+        if user_attributes:
+            embed_request["userAttributes"] = user_attributes
+        
+        # Add dashboard-specific settings
+        if dashboard_filters_interactivity and resource_type == "dashboard":
+            embed_request["content"]["dashboardFiltersInteractivity"] = dashboard_filters_interactivity
+        
+        # Add export permissions
+        if can_export_csv or can_export_images:
+            embed_request["content"]["permissions"] = {
+                "canExportCsv": can_export_csv,
+                "canExportImages": can_export_images,
+            }
+        
+        # Make the API request
+        endpoint = f"/embed/{self.project_id}/get-embed-url"
+        response = await self._make_request("POST", endpoint, data=embed_request)
+        
+        if response.get("status") != "ok":
+            raise Exception(f"Failed to generate embed URL: {response}")
+        
+        return response["results"]["url"]

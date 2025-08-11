@@ -2,6 +2,7 @@
 
 import logging
 from typing import Dict, Any, List
+import json
 
 from mcp.types import Tool, TextContent
 
@@ -35,6 +36,14 @@ async def handle_lightdash_list_charts(
     arguments: Dict[str, Any], config: Config
 ) -> List[TextContent]:
     """Handle the Lightdash list charts request"""
+    
+    # Parse arguments if they come as a string
+    if isinstance(arguments, str):
+        try:
+            arguments = json.loads(arguments)
+        except json.JSONDecodeError:
+            # This tool has optional arguments, so just use empty dict
+            arguments = {}
     
     if not config.lightdash_config:
         return [

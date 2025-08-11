@@ -11,6 +11,7 @@ from dbt_mcp.lightdash.client import LightdashAPIClient
 from dbt_mcp.lightdash.validation import validate_query_parameters
 from dbt_mcp.tools.tool_names import ToolName
 from dbt_mcp.prompts.prompts import get_prompt
+from dbt_mcp.tools.argument_parser import parse_arguments
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +100,19 @@ async def handle_lightdash_run_metric_query(
     arguments: Dict[str, Any], config: Config
 ) -> List[TextContent]:
     """Handle the Lightdash run metric query request"""
+    
+    # Parse arguments using the universal parser
+    try:
+        arguments = parse_arguments(arguments)
+    except Exception as e:
+        logger.error(f"Failed to parse arguments: {e}")
+        logger.error(f"Raw arguments: {arguments}")
+        return [
+            TextContent(
+                type="text",
+                text=f"Error parsing arguments: {str(e)}"
+            )
+        ]
     
     if not config.lightdash_config:
         return [

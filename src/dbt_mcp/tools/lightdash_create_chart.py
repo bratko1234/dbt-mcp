@@ -107,6 +107,19 @@ async def handle_lightdash_create_chart(
             )
         ]
     
+    # Parse arguments if they come as a string
+    if isinstance(arguments, str):
+        try:
+            arguments = json.loads(arguments)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse arguments JSON: {e}")
+            return [
+                TextContent(
+                    type="text",
+                    text=f"Error parsing arguments: {str(e)}"
+                )
+            ]
+    
     # Handle MCP argument wrapping
     # The MCP inspector sometimes sends arguments wrapped in an "arguments" string
     if isinstance(arguments, dict) and "arguments" in arguments and isinstance(arguments["arguments"], str):

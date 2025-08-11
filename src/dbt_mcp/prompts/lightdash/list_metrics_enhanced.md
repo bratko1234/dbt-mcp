@@ -1,109 +1,100 @@
-<instructions>
+# Tool Name: list_metrics_enhanced
+
+## Description
 List all available metrics with enriched metadata from both dbt semantic layer and Lightdash explores.
 
-This tool provides a comprehensive view of metrics available for analysis, showing:
-- Which metrics come from dbt semantic layer [SL]
-- Which metrics are available in Lightdash explores [LD]
-- Which metrics are available in both systems [SL+LD]
+## When to Use
+- Starting a new analysis and discovering metrics
+- Planning which system to use (dbt vs Lightdash)
+- Building charts and need metric context
+- Understanding metric availability by explore
+- Finding metrics across multiple explores
 
-The tool groups metrics by their associated explore/model, making it easy to understand
-what data can be queried together. Use this tool when:
-- Starting a new analysis and need to understand available metrics
-- Planning which tool to use (semantic layer vs Lightdash) for queries
-- Building charts and need to know metric context
+## Metric Sources
+- **[SL]** - Available in dbt semantic layer
+- **[LD]** - Available in Lightdash only
+- **[SL+LD]** - Available in both systems
 
-The enriched metadata includes:
-- Metric descriptions to understand business meaning
-- Data types (number, currency, percentage, etc.)
-- Associated dimensions that can be used with each metric
-- Labels and tags for categorization
+## Parameters
 
-When no metrics match your criteria, the tool will suggest similar metrics
-or guide you to explore other data models that might contain what you need.
-</instructions>
+### Optional:
+- `explore_filter` (string): Filter metrics to specific explore/model
+- `include_lightdash_only` (boolean): Include Lightdash-only metrics (default: true)
 
-<examples>
-<example>
-Question: "What metrics do we have for analyzing customer behavior?"
-    Thinking step-by-step:
-    - User wants customer-related metrics
-    - Should filter or search for customer-related explores
-    - Include both SL and LD metrics for comprehensive view
-    Parameters:
-    explore_filter="customer"
-    include_lightdash_only=true
-    
-    Response interpretation:
-    - Found metrics in 'customers' explore
-    - Shows customer_lifetime_value [SL+LD], customer_count [LD], retention_rate [SL]
-    - Can suggest using these metrics with customer dimensions
-</example>
+## JSON Examples
 
-<example>
-Question: "List all revenue metrics we track"
-    Thinking step-by-step:
-    - User wants revenue-related metrics across all explores
-    - Should search across all explores, not filter by specific one
-    - Look for metrics with 'revenue' in name or description
-    Parameters:
-    include_lightdash_only=true
-    
-    Response interpretation:
-    - Found total_revenue in 'orders' explore [SL+LD]
-    - Found product_revenue in 'products' explore [LD]
-    - Found monthly_recurring_revenue in 'subscriptions' explore [SL]
-    - User can now choose appropriate explore based on analysis needs
-</example>
+### Example 1: List all metrics across all explores
+```json
+{}
+```
 
-<example>
-Question: "What metrics can I use with the orders data?"
-    Thinking step-by-step:
-    - User specifically asking about 'orders' explore
-    - Should filter to just that explore
-    - Show all available metrics regardless of source
-    Parameters:
-    explore_filter="orders"
-    include_lightdash_only=true
-    
-    Response shows:
-    - total_revenue [SL+LD] - Sum of all order amounts
-    - order_count [LD] - Number of orders
-    - average_order_value [SL+LD] - Revenue divided by order count
-    - Shows these can be grouped by: created_date, status, customer_name
-</example>
+### Example 2: Filter metrics to specific explore
+```json
+{
+  "explore_filter": "orders",
+  "include_lightdash_only": true
+}
+```
 
-<example>
-Question: "I need to build a dashboard about product performance"
-    Thinking step-by-step:
-    - User planning dashboard, needs comprehensive metric list
-    - Should look for product-related explores
-    - Include context about how metrics relate
-    Parameters:
-    explore_filter="product"
-    include_lightdash_only=true
-    
-    Response interpretation:
-    - Found 'products' explore with: units_sold, revenue, return_rate
-    - Found 'orders' explore with product dimensions and sales metrics
-    - Can suggest combining metrics from both explores for complete dashboard
-</example>
+### Example 3: Show only cross-platform metrics
+```json
+{
+  "include_lightdash_only": false
+}
+```
 
-<example>
-Question: "Show me only the metrics that are in both dbt and Lightdash"
-    Thinking step-by-step:
-    - User wants to see overlap between systems
-    - Should exclude Lightdash-only metrics
-    - Useful for understanding migration status
-    Parameters:
-    include_lightdash_only=false
-    
-    Response shows only [SL+LD] metrics:
-    - More reliable for cross-system workflows
-    - Can be queried through either tool
-</example>
-</examples>
+### Example 4: Find customer-related metrics
+```json
+{
+  "explore_filter": "customer",
+  "include_lightdash_only": true
+}
+```
 
-<parameters>
-explore_filter: Optional filter to show metrics from specific explore/model only
-include_lightdash_only: Whether to include metrics that only exist in Lightdash (default: true)
-</parameters>
+### Example 5: Product explore metrics only
+```json
+{
+  "explore_filter": "products",
+  "include_lightdash_only": true
+}
+```
+
+## Response Structure
+Groups metrics by explore showing:
+- Metric name with source indicator
+- Description
+- Data type (number, currency, percent)
+- Associated dimensions
+- Labels and tags
+
+Example output format:
+```
+orders:
+  - total_revenue [SL+LD] - Sum of all order amounts
+  - order_count [LD] - Number of orders  
+  - average_order_value [SL+LD] - Revenue per order
+  Dimensions: created_date, status, customer_name
+```
+
+## Common Mistakes to Avoid
+- ❌ Using exact explore names (use partial match)
+- ❌ Expecting metric details (use get_explore)
+- ✅ Use explore_filter for fuzzy matching
+- ✅ Check both systems for full coverage
+
+## Usage Patterns
+1. **Dashboard Planning**: List all metrics, note explores
+2. **Cross-System Work**: Set include_lightdash_only=false
+3. **Explore Discovery**: Filter by business area
+4. **Migration Status**: Compare [SL] vs [LD] metrics
+
+## Related Tools
+- `lightdash_list_explores` - See all available explores
+- `lightdash_get_explore` - Get detailed field info
+- `lightdash_create_chart` - Use discovered metrics
+- `dbt_list_semantic_models` - dbt-only metrics
+
+## Notes
+- Partial explore names work (e.g., "cust" matches "customers")
+- Enriched metadata helps understand metric relationships
+- Use for metric discovery before creating charts

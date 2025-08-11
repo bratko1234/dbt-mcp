@@ -37,6 +37,14 @@ async def handle_lightdash_get_chart(
 ) -> List[TextContent]:
     """Handle the Lightdash get chart request"""
     
+    # Parse arguments if they come as a string
+    if isinstance(arguments, str):
+        try:
+            arguments = json.loads(arguments)
+        except json.JSONDecodeError:
+            # If it's just a plain string, assume it's the chart_id
+            arguments = {"chart_id": arguments}
+    
     if not config.lightdash_config:
         return [
             TextContent(

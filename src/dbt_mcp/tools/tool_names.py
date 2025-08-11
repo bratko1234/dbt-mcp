@@ -48,6 +48,13 @@ class ToolName(Enum):
     LIGHTDASH_GET_EMBED_URL = "lightdash_get_embed_url"
     # LIGHTDASH_RUN_QUERY removed - was for semantic layer integration
     # Use LIGHTDASH_RUN_METRIC_QUERY instead
+    
+    # Dashboard tools
+    LIGHTDASH_LIST_DASHBOARDS = "lightdash_list_dashboards"
+    LIGHTDASH_GET_DASHBOARD = "lightdash_get_dashboard"
+    LIGHTDASH_CREATE_DASHBOARD = "lightdash_create_dashboard"
+    LIGHTDASH_UPDATE_DASHBOARD = "lightdash_update_dashboard"
+    LIGHTDASH_DELETE_DASHBOARD = "lightdash_delete_dashboard"
 
     @classmethod
     def get_all_tool_names(cls) -> set[str]:

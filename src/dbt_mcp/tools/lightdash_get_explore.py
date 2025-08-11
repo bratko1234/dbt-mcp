@@ -10,6 +10,7 @@ from dbt_mcp.config.config import Config
 from dbt_mcp.lightdash.client import LightdashAPIClient
 from dbt_mcp.tools.tool_names import ToolName
 from dbt_mcp.prompts.prompts import get_prompt
+from dbt_mcp.tools.argument_parser import parse_arguments
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,22 @@ async def handle_lightdash_get_explore(
             TextContent(
                 type="text",
                 text="Error: Lightdash configuration is not available"
+            )
+        ]
+    
+    # Parse arguments using the universal parser
+    original_args = arguments
+    try:
+        arguments = parse_arguments(arguments)
+        # If we got an empty dict and the original was a string, assume it's the explore_id
+        if not arguments and isinstance(original_args, str):
+            arguments = {"explore_id": original_args}
+    except Exception as e:
+        logger.error(f"Failed to parse arguments: {e}")
+        return [
+            TextContent(
+                type="text",
+                text=f"Error parsing arguments: {str(e)}"
             )
         ]
     

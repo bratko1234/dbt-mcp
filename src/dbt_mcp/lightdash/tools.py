@@ -25,6 +25,14 @@ from dbt_mcp.tools.lightdash_create_chart import (
     get_lightdash_create_chart_tool,
     handle_lightdash_create_chart,
 )
+from dbt_mcp.tools.lightdash_edit_chart import (
+    get_lightdash_edit_chart_tool,
+    handle_lightdash_edit_chart,
+)
+from dbt_mcp.tools.lightdash_delete_chart import (
+    get_lightdash_delete_chart_tool,
+    handle_lightdash_delete_chart,
+)
 # Removed: lightdash_save_query_as_chart (semantic layer tool)
 # Use lightdash_run_metric_query or lightdash_create_chart instead
 from dbt_mcp.tools.lightdash_list_explores import (
@@ -50,6 +58,27 @@ from dbt_mcp.tools.lightdash_get_user import (
 from dbt_mcp.tools.lightdash_get_embed_url import (
     get_lightdash_get_embed_url_tool,
     handle_lightdash_get_embed_url,
+)
+# Dashboard tools
+from dbt_mcp.tools.lightdash_list_dashboards import (
+    get_lightdash_list_dashboards_tool,
+    handle_lightdash_list_dashboards,
+)
+from dbt_mcp.tools.lightdash_get_dashboard import (
+    get_lightdash_get_dashboard_tool,
+    handle_lightdash_get_dashboard,
+)
+from dbt_mcp.tools.lightdash_create_dashboard import (
+    get_lightdash_create_dashboard_tool,
+    handle_lightdash_create_dashboard,
+)
+from dbt_mcp.tools.lightdash_edit_dashboard import (
+    get_lightdash_edit_dashboard_tool,
+    handle_lightdash_edit_dashboard,
+)
+from dbt_mcp.tools.lightdash_delete_dashboard import (
+    get_lightdash_delete_dashboard_tool,
+    handle_lightdash_delete_dashboard,
 )
 
 logger = logging.getLogger(__name__)
@@ -111,6 +140,30 @@ def register_lightdash_tools(
         async def lightdash_create_chart_handler(arguments):
             return await handle_lightdash_create_chart(arguments, config)
         logger.info("Registered lightdash_create_chart tool")
+    
+    # Edit Chart tool
+    if ToolName.LIGHTDASH_UPDATE_CHART not in disable_tools:
+        tool_def = get_lightdash_edit_chart_tool()
+        @mcp.tool(
+            name=tool_def.name,
+            description=tool_def.description,
+            structured_output=False
+        )
+        async def lightdash_edit_chart_handler(arguments):
+            return await handle_lightdash_edit_chart(arguments, config)
+        logger.info("Registered lightdash_update_chart tool")
+    
+    # Delete Chart tool
+    if ToolName.LIGHTDASH_DELETE_CHART not in disable_tools:
+        tool_def = get_lightdash_delete_chart_tool()
+        @mcp.tool(
+            name=tool_def.name,
+            description=tool_def.description,
+            structured_output=False
+        )
+        async def lightdash_delete_chart_handler(arguments):
+            return await handle_lightdash_delete_chart(arguments, config)
+        logger.info("Registered lightdash_delete_chart tool")
     
     # Note: lightdash_run_query (semantic layer tool) has been removed
     # Use lightdash_run_metric_query or lightdash_create_chart instead
@@ -187,3 +240,65 @@ def register_lightdash_tools(
         async def get_embed_url_handler(arguments):
             return await handle_lightdash_get_embed_url(arguments, config)
         logger.info("Registered lightdash_get_embed_url tool")
+    
+    # Dashboard Tools
+    
+    # List Dashboards tool
+    if ToolName.LIGHTDASH_LIST_DASHBOARDS not in disable_tools:
+        tool_def = get_lightdash_list_dashboards_tool()
+        @mcp.tool(
+            name=tool_def.name,
+            description=tool_def.description,
+            structured_output=False
+        )
+        async def lightdash_list_dashboards_handler(arguments):
+            return await handle_lightdash_list_dashboards(arguments, config)
+        logger.info("Registered lightdash_list_dashboards tool")
+    
+    # Get Dashboard tool
+    if ToolName.LIGHTDASH_GET_DASHBOARD not in disable_tools:
+        tool_def = get_lightdash_get_dashboard_tool()
+        @mcp.tool(
+            name=tool_def.name,
+            description=tool_def.description,
+            structured_output=False
+        )
+        async def lightdash_get_dashboard_handler(arguments):
+            return await handle_lightdash_get_dashboard(arguments, config)
+        logger.info("Registered lightdash_get_dashboard tool")
+    
+    # Create Dashboard tool
+    if ToolName.LIGHTDASH_CREATE_DASHBOARD not in disable_tools:
+        tool_def = get_lightdash_create_dashboard_tool()
+        @mcp.tool(
+            name=tool_def.name,
+            description=tool_def.description,
+            structured_output=False
+        )
+        async def lightdash_create_dashboard_handler(arguments):
+            return await handle_lightdash_create_dashboard(arguments, config)
+        logger.info("Registered lightdash_create_dashboard tool")
+    
+    # Edit Dashboard tool
+    if ToolName.LIGHTDASH_UPDATE_DASHBOARD not in disable_tools:
+        tool_def = get_lightdash_edit_dashboard_tool()
+        @mcp.tool(
+            name=tool_def.name,
+            description=tool_def.description,
+            structured_output=False
+        )
+        async def lightdash_edit_dashboard_handler(arguments):
+            return await handle_lightdash_edit_dashboard(arguments, config)
+        logger.info("Registered lightdash_update_dashboard tool")
+    
+    # Delete Dashboard tool
+    if ToolName.LIGHTDASH_DELETE_DASHBOARD not in disable_tools:
+        tool_def = get_lightdash_delete_dashboard_tool()
+        @mcp.tool(
+            name=tool_def.name,
+            description=tool_def.description,
+            structured_output=False
+        )
+        async def lightdash_delete_dashboard_handler(arguments):
+            return await handle_lightdash_delete_dashboard(arguments, config)
+        logger.info("Registered lightdash_delete_dashboard tool")

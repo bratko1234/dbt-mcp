@@ -1,0 +1,42 @@
+# LibreChat Configuration Update for dbt-mcp-lightdash v0.8.0
+# 
+# Phase 2 Complete! All chart and dashboard management tools are now available.
+# 
+# Update your librechat.yaml with this configuration:
+
+mcpServers:
+  dbt-mcp-lightdash:
+    type: stdio
+    command: uvx
+    args:
+      - "dbt-mcp-lightdash@0.8.0"  # Updated from 0.7.0
+    env:
+      LIGHTDASH_API_URL: "http://host.docker.internal:3000/api/v1"
+      LIGHTDASH_API_KEY: "your_api_key"
+      LIGHTDASH_PROJECT_ID: "your_project_id"
+      LIGHTDASH_DEFAULT_SPACE_ID: "your_space_id"
+      LIGHTDASH_DEFAULT_CHART_TYPE: "table"
+      DISABLE_DBT_CLI: "true"
+      DISABLE_SEMANTIC_LAYER: "true"
+      DISABLE_DISCOVERY: "true"
+      DISABLE_REMOTE: "true"
+      DISABLE_LIGHTDASH: "false"
+
+# New tools available in v0.8.0:
+# 
+# Chart Management:
+# - lightdash_edit_chart - Edit chart metadata (name/description only)
+# - lightdash_delete_chart - Delete charts with confirmation
+# 
+# Dashboard Management:
+# - lightdash_list_dashboards - List dashboards with filtering
+# - lightdash_get_dashboard - Get dashboard configuration
+# - lightdash_create_dashboard - Create new dashboards
+# - lightdash_edit_dashboard - Edit dashboard configuration
+# - lightdash_delete_dashboard - Delete dashboards with confirmation
+# 
+# Important Notes:
+# 1. Chart queries cannot be edited - only name and description
+# 2. To modify chart queries, create a new chart
+# 3. All dashboard tools require the "tabs" field in the API
+# 4. Dashboard embedding remains available via lightdash_get_embed_url
