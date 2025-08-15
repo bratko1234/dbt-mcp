@@ -191,15 +191,24 @@ async def handle_lightdash_run_metric_query(
                         processed_field = field.replace('.', '_')
                     else:
                         processed_field = f"{explore_id}_{field}"
-                        
-                    filter_rules.append({
+                    
+                    filter_rule = {
                         "id": processed_field,
                         "target": {
                             "fieldId": processed_field
                         },
                         "operator": operator,
                         "values": [value] if not isinstance(value, list) else value
-                    })
+                    }
+                    
+                    # Add settings for time-based filters
+                    if operator == "inThePast" and filter_spec.get("unit"):
+                        filter_rule["settings"] = {
+                            "unitOfTime": filter_spec["unit"],
+                            "completed": False
+                        }
+                    
+                    filter_rules.append(filter_rule)
         
         # Set filters in the query
         if filter_rules:
@@ -218,7 +227,7 @@ async def handle_lightdash_run_metric_query(
         # Add sorts if provided
         for sort_spec in sort:
             field = sort_spec.get("field")
-            descending = sort_spec.get("descending", False)
+            order = sort_spec.get("order", "asc")  # Changed from descending to order
             if field:
                 # Process field name same as metrics/dimensions
                 if field.startswith(f"{explore_id}_"):
@@ -230,7 +239,7 @@ async def handle_lightdash_run_metric_query(
                     
                 metric_query["sorts"].append({
                     "fieldId": processed_field,
-                    "descending": descending
+                    "descending": order == "desc"  # Convert order to descending boolean
                 })
         
         # Execute the query using v2 API endpoint with async query

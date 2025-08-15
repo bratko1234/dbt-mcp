@@ -35,18 +35,8 @@ from dbt_mcp.tools.lightdash_delete_chart import (
 )
 # Removed: lightdash_save_query_as_chart (semantic layer tool)
 # Use lightdash_run_metric_query or lightdash_create_chart instead
-from dbt_mcp.tools.lightdash_list_explores import (
-    get_lightdash_list_explores_tool,
-    handle_lightdash_list_explores,
-)
-from dbt_mcp.tools.lightdash_get_explore import (
-    get_lightdash_get_explore_tool,
-    handle_lightdash_get_explore,
-)
-from dbt_mcp.tools.enhanced_list_metrics import (
-    get_enhanced_list_metrics_tool,
-    handle_enhanced_list_metrics,
-)
+# Removed: lightdash_list_explores, lightdash_get_explore, enhanced_list_metrics
+# Use lightdash_smart_query instead for natural language queries
 from dbt_mcp.tools.lightdash_run_metric_query import (
     get_lightdash_run_metric_query_tool,
     handle_lightdash_run_metric_query,
@@ -79,6 +69,11 @@ from dbt_mcp.tools.lightdash_edit_dashboard import (
 from dbt_mcp.tools.lightdash_delete_dashboard import (
     get_lightdash_delete_dashboard_tool,
     handle_lightdash_delete_dashboard,
+)
+# Smart query tool for natural language
+from dbt_mcp.tools.lightdash_smart_query import (
+    get_lightdash_smart_query_tool,
+    handle_lightdash_smart_query,
 )
 
 logger = logging.getLogger(__name__)
@@ -168,45 +163,11 @@ def register_lightdash_tools(
     # Note: lightdash_run_query (semantic layer tool) has been removed
     # Use lightdash_run_metric_query or lightdash_create_chart instead
     
-    # List Explores tool
-    if ToolName.LIGHTDASH_LIST_EXPLORES not in disable_tools:
-        tool_def = get_lightdash_list_explores_tool()
-        @mcp.tool(
-            name=tool_def.name,
-            description=tool_def.description,
-            structured_output=False
-        )
-        async def lightdash_list_explores_handler(arguments):
-            return await handle_lightdash_list_explores(arguments, config)
-        logger.info("Registered lightdash_list_explores tool")
-    
-    # Get Explore tool
-    if ToolName.LIGHTDASH_GET_EXPLORE not in disable_tools:
-        tool_def = get_lightdash_get_explore_tool()
-        @mcp.tool(
-            name=tool_def.name,
-            description=tool_def.description,
-            structured_output=False
-        )
-        async def lightdash_get_explore_handler(arguments):
-            return await handle_lightdash_get_explore(arguments, config)
-        logger.info("Registered lightdash_get_explore tool")
-    
-    # Enhanced List Metrics tool
-    # Note: This doesn't have a specific ToolName yet, so we check if Lightdash is enabled
-    if config.lightdash_config:
-        tool_def = get_enhanced_list_metrics_tool()
-        @mcp.tool(
-            name=tool_def.name,
-            description=tool_def.description,
-            structured_output=False
-        )
-        async def enhanced_list_metrics_handler(arguments):
-            return await handle_enhanced_list_metrics(arguments, config)
-        logger.info("Registered enhanced list_metrics_enhanced tool")
+    # Note: lightdash_list_explores, lightdash_get_explore, enhanced_list_metrics removed
+    # Use lightdash_smart_query for natural language queries instead
     
     # Run Metric Query tool (Lightdash-based semantic layer)
-    if config.lightdash_config:
+    if ToolName.LIGHTDASH_RUN_METRIC_QUERY not in disable_tools:
         tool_def = get_lightdash_run_metric_query_tool()
         @mcp.tool(
             name=tool_def.name,
@@ -218,7 +179,7 @@ def register_lightdash_tools(
         logger.info("Registered lightdash_run_metric_query tool")
     
     # Get User tool
-    if config.lightdash_config:
+    if ToolName.LIGHTDASH_GET_USER not in disable_tools:
         tool_def = get_lightdash_get_user_tool()
         @mcp.tool(
             name=tool_def.name,
@@ -302,3 +263,15 @@ def register_lightdash_tools(
         async def lightdash_delete_dashboard_handler(arguments):
             return await handle_lightdash_delete_dashboard(arguments, config)
         logger.info("Registered lightdash_delete_dashboard tool")
+    
+    # Smart Query tool - Natural language queries
+    if ToolName.LIGHTDASH_SMART_QUERY not in disable_tools:
+        tool_def = get_lightdash_smart_query_tool()
+        @mcp.tool(
+            name=tool_def.name,
+            description=tool_def.description,
+            structured_output=False
+        )
+        async def lightdash_smart_query_handler(arguments):
+            return await handle_lightdash_smart_query(arguments, config)
+        logger.info("Registered lightdash_smart_query tool")

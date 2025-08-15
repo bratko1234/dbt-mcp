@@ -43,11 +43,14 @@ class ToolName(Enum):
     LIGHTDASH_CREATE_CHART = "lightdash_create_chart"
     LIGHTDASH_UPDATE_CHART = "lightdash_update_chart"
     LIGHTDASH_DELETE_CHART = "lightdash_delete_chart"
-    LIGHTDASH_LIST_EXPLORES = "lightdash_list_explores"
-    LIGHTDASH_GET_EXPLORE = "lightdash_get_explore"
+    # LIGHTDASH_LIST_EXPLORES removed - use LIGHTDASH_SMART_QUERY
+    # LIGHTDASH_GET_EXPLORE removed - use LIGHTDASH_SMART_QUERY
+    # ENHANCED_LIST_METRICS removed - use LIGHTDASH_SMART_QUERY
     LIGHTDASH_GET_EMBED_URL = "lightdash_get_embed_url"
+    LIGHTDASH_GET_USER = "lightdash_get_user"
+    LIGHTDASH_SMART_QUERY = "lightdash_smart_query"  # Natural language query tool
+    LIGHTDASH_RUN_METRIC_QUERY = "lightdash_run_metric_query"  # Direct metric queries
     # LIGHTDASH_RUN_QUERY removed - was for semantic layer integration
-    # Use LIGHTDASH_RUN_METRIC_QUERY instead
     
     # Dashboard tools
     LIGHTDASH_LIST_DASHBOARDS = "lightdash_list_dashboards"

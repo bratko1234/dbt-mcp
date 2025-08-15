@@ -827,6 +827,78 @@ Edit an existing Lightdash dashboard by adding/removing content, renaming, or re
 
 **Status**: Phase 3 COMPLETE! Published as v0.8.3 on PyPI.
 
+---
+
+## 🚀 Phase 4: Semantic Intelligence Layer (IN PROGRESS)
+
+### Overview
+Implement a semantic catalog that understands the business context, enabling natural language queries without multiple discovery steps. This addresses the core issue where LLMs struggle with the current multi-step query process.
+
+### Phase 4 Goals
+1. **Semantic Catalog**: Build intelligence about the specific data model
+2. **Natural Language**: Enable queries like "last 7 days of sales" to work immediately
+3. **Store Awareness**: Handle multi-store context (write_key dimension)
+4. **Tool Simplification**: Reduce from 5+ tool calls to 1 for common queries
+
+### Implementation Status
+
+#### Priority 15: Semantic Catalog Foundation
+**Goal**: Create business-aware data model mapping
+
+- [ ] Task 15.1: Create semantic catalog module
+  - Map business terms to explores/metrics
+  - Define store (write_key) mappings
+  - Handle time dimension patterns
+  
+- [ ] Task 15.2: Implement smart query parser
+  - Natural language time range parsing
+  - Store context detection
+  - Metric selection logic
+
+#### Priority 16: New Intelligent Tools
+**Goal**: Replace discovery-based workflow with smart tools
+
+- [ ] Task 16.1: `lightdash_smart_query` tool
+  - Direct business question answering
+  - Automatic explore/metric selection
+  - Store filtering support
+  
+- [ ] Task 16.2: `lightdash_store_comparison` tool
+  - Multi-store performance comparison
+  - Write_key to store name mapping
+  
+- [ ] Task 16.3: `lightdash_quick_metrics` tool
+  - Instant key metrics retrieval
+  - Common time ranges (today, yesterday, this month)
+
+#### Priority 17: Tool Deprecation & Migration
+**Goal**: Sunset redundant tools, enhance others
+
+- [ ] Task 17.1: Deprecate discovery tools
+  - Add warnings to `lightdash_list_explores`
+  - Add warnings to `lightdash_get_explore`
+  - Add warnings to `list_metrics_enhanced`
+  
+- [ ] Task 17.2: Enhance `lightdash_run_metric_query`
+  - Add semantic intelligence
+  - Auto-resolve field names
+  - Smart time grain detection
+
+### Tools Being Sunset
+1. **lightdash_list_explores** - Replaced by semantic catalog
+2. **lightdash_get_explore** - No longer needed
+3. **list_metrics_enhanced** - Built into smart tools
+4. **lightdash_run_metric_query** - Enhanced, not removed
+
+### Key Technical Decisions
+- Semantic catalog hardcoded for this specific Lightdash instance
+- Write_key represents different stores (US, UK, AU, etc.)
+- All queries automatically filtered by organizationUuid
+- Time grains automatically detected based on query context
+
+**Target Version**: v0.9.0
+**Status**: Planning complete, implementation starting
+
 ## 📝 Important Notes:
 
 ### Dashboard-Only Embedding
@@ -835,7 +907,7 @@ Edit an existing Lightdash dashboard by adding/removing content, renaming, or re
 - **Reason**: This is a Lightdash API design decision, not a limitation of our implementation
 
 ### Current Implementation Details
-- **Version**: 0.8.3 (latest on PyPI)
+- **Version**: 0.9.1 (latest on PyPI)
 - **Approach**: HTML artifacts with iframe embedding
 - **Security**: JWT tokens with configurable expiration (default 8 hours)
 - **No Frontend Modifications**: Uses LibreChat's existing artifact system
@@ -848,3 +920,16 @@ Edit an existing Lightdash dashboard by adding/removing content, renaming, or re
 - **Common mistakes section** helps prevent argument errors
 - **Tool descriptions ARE passed to LLMs** as context for tool selection
 - **Published to PyPI** as version 0.8.3
+
+### Phase 4 Completion Summary (v0.9.1) ✅
+- **Semantic Intelligence Layer** fully implemented with natural language understanding
+- **lightdash_smart_query** tool enables business questions in plain English
+- **Semantic catalog** maps business domains (sales, marketing, attribution, leads) to technical fields
+- **Time range parsing** understands "last 7 days", "this month", "yesterday" etc.
+- **Automatic metric selection** based on question context
+- **Dynamic dimension detection** from "by campaign", "by channel" etc.
+- **Fixed critical bugs**:
+  - Time filters now properly use `unitOfTime` settings for `inThePast` operator
+  - Corrected time dimension from `created_at` to `event_date` for orders
+  - Fixed metric selection to use `total_net_revenue` instead of `total_revenue`
+- **Published to PyPI** as version 0.9.1
