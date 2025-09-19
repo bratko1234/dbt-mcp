@@ -5,7 +5,10 @@ Maps business concepts to technical implementation details.
 
 from typing import Dict, List, Optional, Any
 import re
+import logging
 from datetime import datetime, timedelta
+
+logger = logging.getLogger(__name__)
 
 # Semantic mapping of business concepts to Lightdash explores
 SEMANTIC_CATALOG = {
@@ -458,7 +461,7 @@ def parse_store_context(question: str, domain: str) -> Dict[str, Any]:
     return store_context
 
 
-def build_smart_query(question: str) -> Dict[str, Any]:
+def build_smart_query(question: str, config: Optional[Any] = None) -> Dict[str, Any]:
     """
     Build a complete Lightdash query from a natural language question.
     

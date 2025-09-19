@@ -261,11 +261,12 @@ async def handle_lightdash_create_chart(
         
         # Add filters if provided
         if filter_rules:
+            # FIXED: Use correct Lightdash filter structure
             metric_query["filters"] = {
-                "and": [{
+                "dimensions": {
                     "id": "root",
                     "and": filter_rules
-                }]
+                }
             }
         
         # Create the chart

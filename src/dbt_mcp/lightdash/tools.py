@@ -33,14 +33,11 @@ from dbt_mcp.tools.lightdash_delete_chart import (
     get_lightdash_delete_chart_tool,
     handle_lightdash_delete_chart,
 )
-# Removed: lightdash_save_query_as_chart (semantic layer tool)
-# Use lightdash_run_metric_query or lightdash_create_chart instead
-# Removed: lightdash_list_explores, lightdash_get_explore, enhanced_list_metrics
-# Use lightdash_smart_query instead for natural language queries
-from dbt_mcp.tools.lightdash_run_metric_query import (
-    get_lightdash_run_metric_query_tool,
-    handle_lightdash_run_metric_query,
-)
+# Discovery tools follow progressive flow pattern:
+# 1. lightdash_list_explores - see available data models
+# 2. lightdash_list_metrics - see metrics in those models  
+# 3. lightdash_get_dimensions - see dimensions for metrics
+# 4. lightdash_query_metrics - run the analysis
 from dbt_mcp.tools.lightdash_get_user import (
     get_lightdash_get_user_tool,
     handle_lightdash_get_user,
@@ -70,10 +67,23 @@ from dbt_mcp.tools.lightdash_delete_dashboard import (
     get_lightdash_delete_dashboard_tool,
     handle_lightdash_delete_dashboard,
 )
-# Smart query tool for natural language
-from dbt_mcp.tools.lightdash_smart_query import (
-    get_lightdash_smart_query_tool,
-    handle_lightdash_smart_query,
+# Smart query tool removed - use progressive discovery flow instead
+# Progressive discovery tools (following dbt-mcp pattern)
+from dbt_mcp.tools.lightdash_list_explores import (
+    get_lightdash_list_explores_tool,
+    handle_lightdash_list_explores,
+)
+from dbt_mcp.tools.lightdash_list_metrics import (
+    get_lightdash_list_metrics_tool,
+    handle_lightdash_list_metrics,
+)
+from dbt_mcp.tools.lightdash_get_dimensions import (
+    get_lightdash_get_dimensions_tool,
+    handle_lightdash_get_dimensions,
+)
+from dbt_mcp.tools.lightdash_query_metrics import (
+    get_lightdash_query_metrics_tool,
+    handle_lightdash_query_metrics,
 )
 
 logger = logging.getLogger(__name__)
@@ -161,22 +171,9 @@ def register_lightdash_tools(
         logger.info("Registered lightdash_delete_chart tool")
     
     # Note: lightdash_run_query (semantic layer tool) has been removed
-    # Use lightdash_run_metric_query or lightdash_create_chart instead
-    
+    # Note: lightdash_run_metric_query has been removed (redundant with smart_query)
     # Note: lightdash_list_explores, lightdash_get_explore, enhanced_list_metrics removed
-    # Use lightdash_smart_query for natural language queries instead
-    
-    # Run Metric Query tool (Lightdash-based semantic layer)
-    if ToolName.LIGHTDASH_RUN_METRIC_QUERY not in disable_tools:
-        tool_def = get_lightdash_run_metric_query_tool()
-        @mcp.tool(
-            name=tool_def.name,
-            description=tool_def.description,
-            structured_output=False
-        )
-        async def run_metric_query_handler(arguments):
-            return await handle_lightdash_run_metric_query(arguments, config)
-        logger.info("Registered lightdash_run_metric_query tool")
+    # Use lightdash_smart_query for all natural language queries
     
     # Get User tool
     if ToolName.LIGHTDASH_GET_USER not in disable_tools:
@@ -264,14 +261,52 @@ def register_lightdash_tools(
             return await handle_lightdash_delete_dashboard(arguments, config)
         logger.info("Registered lightdash_delete_dashboard tool")
     
-    # Smart Query tool - Natural language queries
-    if ToolName.LIGHTDASH_SMART_QUERY not in disable_tools:
-        tool_def = get_lightdash_smart_query_tool()
+    # Smart query tool removed - use progressive discovery flow instead
+    # Progressive discovery tools (following dbt-mcp pattern)
+    # List Explores tool
+    if ToolName.LIGHTDASH_LIST_EXPLORES not in disable_tools:
+        tool_def = get_lightdash_list_explores_tool()
         @mcp.tool(
             name=tool_def.name,
             description=tool_def.description,
             structured_output=False
         )
-        async def lightdash_smart_query_handler(arguments):
-            return await handle_lightdash_smart_query(arguments, config)
-        logger.info("Registered lightdash_smart_query tool")
+        async def lightdash_list_explores_handler(arguments):
+            return await handle_lightdash_list_explores(arguments, config)
+        logger.info("Registered lightdash_list_explores tool")
+    
+    # List Metrics tool
+    if ToolName.LIGHTDASH_LIST_METRICS not in disable_tools:
+        tool_def = get_lightdash_list_metrics_tool()
+        @mcp.tool(
+            name=tool_def.name,
+            description=tool_def.description,
+            structured_output=False
+        )
+        async def lightdash_list_metrics_handler(arguments):
+            return await handle_lightdash_list_metrics(arguments, config)
+        logger.info("Registered lightdash_list_metrics tool")
+    
+    # Get Dimensions tool
+    if ToolName.LIGHTDASH_GET_DIMENSIONS not in disable_tools:
+        tool_def = get_lightdash_get_dimensions_tool()
+        @mcp.tool(
+            name=tool_def.name,
+            description=tool_def.description,
+            structured_output=False
+        )
+        async def lightdash_get_dimensions_handler(arguments):
+            return await handle_lightdash_get_dimensions(arguments, config)
+        logger.info("Registered lightdash_get_dimensions tool")
+    
+    # Query Metrics tool
+    if ToolName.LIGHTDASH_QUERY_METRICS not in disable_tools:
+        tool_def = get_lightdash_query_metrics_tool()
+        @mcp.tool(
+            name=tool_def.name,
+            description=tool_def.description,
+            structured_output=False
+        )
+        async def lightdash_query_metrics_handler(arguments):
+            return await handle_lightdash_query_metrics(arguments, config)
+        logger.info("Registered lightdash_query_metrics tool")
